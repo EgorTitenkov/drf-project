@@ -3,11 +3,12 @@ from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from api.mixins import StaffEditorPermissionMixin
 from .models import Product
 from .serializers import ProductSerializer
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(generics.ListCreateAPIView, StaffEditorPermissionMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -23,7 +24,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 product_list_create_view = ProductListCreateAPIView.as_view()
 
 
-class ProductDetailAPIView(generics.RetrieveAPIView):
+class ProductDetailAPIView(generics.RetrieveAPIView, StaffEditorPermissionMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -31,7 +32,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 product_detail_view = ProductDetailAPIView.as_view()
 
 
-class ProductUpdateAPIView(generics.UpdateAPIView):
+class ProductUpdateAPIView(generics.UpdateAPIView, StaffEditorPermissionMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
@@ -45,7 +46,7 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
 product_update_view = ProductUpdateAPIView.as_view()
 
 
-class ProductDestroyAPIView(generics.DestroyAPIView):
+class ProductDestroyAPIView(generics.DestroyAPIView, StaffEditorPermissionMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
@@ -76,7 +77,7 @@ class ProductMixinView(
     lookup_field = 'pk'
 
     def get(self, request, *args, **kwargs):
-        print((args,kwargs))
+        print((args, kwargs))
         pk = kwargs.get('pk')
         if pk is not None:
             return self.retrieve(request, *args, **kwargs)
@@ -86,11 +87,7 @@ class ProductMixinView(
         return self.create(request, *args, **kwargs)
 
 
-
 product_mixin_view = ProductMixinView.as_view()
-
-
-
 
 
 @api_view(['GET', 'POST'])
