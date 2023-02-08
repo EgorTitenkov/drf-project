@@ -25,6 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
 
     title = serializers.CharField(validators=[validators.validate_title_no_hello, validators.unique_product_title])
+    body = serializers.CharField(source='content')
 
     class Meta:
         model = Product
@@ -39,6 +40,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'price',
             'sale_price',
             'public',
+            'path',
         ]
 
     def get_my_user_data(self, obj):

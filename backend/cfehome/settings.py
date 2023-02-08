@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,13 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'algoliasearch_django',
-    
+
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 
     'api',
     'products',
     'search',
+    'articles',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +134,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         "rest_framework.authentication.SessionAuthentication",
         "api.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
 
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -144,4 +148,11 @@ ALGOLIA = {
     'APPLICATION_ID': '1SREPKCM4J',
     'API_KEY': '1b2c6d32aea385912c108d6c2d12a336',
     'INDEX_PREFIX': 'cfe'
+}
+
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ["Bearer"],
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(seconds=30),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(minutes=1),
 }
