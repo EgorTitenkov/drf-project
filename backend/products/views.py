@@ -3,22 +3,36 @@ from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.mixins import StaffEditorPermissionMixin
+from api.mixins import StaffEditorPermissionMixin, UserQuerySetMixin
 from .models import Product
 from .serializers import ProductSerializer
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView, StaffEditorPermissionMixin):
+class ProductListCreateAPIView(
+    UserQuerySetMixin,
+    generics.ListCreateAPIView,
+    StaffEditorPermissionMixin
+):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
     def perform_create(self, serializer):
+        email = serializer.validated_data.pop('email')
+        print(email)
         title = serializer.validated_data.get('title')
         content = serializer.validated_data.get('content') or None
         if content is None:
             content = title
+        serializer.save(user=self.request.user, content=content)
 
-        serializer.save(content=content)
+    # def get_queryset(self, *args, **kwargs):
+    #     qs = super().get_queryset(*args, **kwargs)
+    #     request = self.request
+    #     user = request.user
+    #     if not user.is_authenticated:
+    #         return Product.objects.none()
+    #     # print(request.user)
+    #     return qs.filter(user=request.user)
 
 
 product_list_create_view = ProductListCreateAPIView.as_view()
@@ -32,7 +46,11 @@ class ProductDetailAPIView(generics.RetrieveAPIView, StaffEditorPermissionMixin)
 product_detail_view = ProductDetailAPIView.as_view()
 
 
-class ProductUpdateAPIView(generics.UpdateAPIView, StaffEditorPermissionMixin):
+class ProductUpdateAPIView(
+    UserQuerySetMixin,
+    generics.UpdateAPIView,
+    StaffEditorPermissionMixin
+):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
@@ -46,7 +64,11 @@ class ProductUpdateAPIView(generics.UpdateAPIView, StaffEditorPermissionMixin):
 product_update_view = ProductUpdateAPIView.as_view()
 
 
-class ProductDestroyAPIView(generics.DestroyAPIView, StaffEditorPermissionMixin):
+class ProductDestroyAPIView(
+    UserQuerySetMixin,
+    generics.DestroyAPIView,
+    StaffEditorPermissionMixin
+ ):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
